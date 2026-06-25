@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+.eggs/
+*.xmind
+!tests/fixtures/*.xmind
+.venv/
+venv/
+
+# 原始规划文档，不上传
+PROJECT.md

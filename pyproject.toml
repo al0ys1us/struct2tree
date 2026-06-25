@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "struct2tree"
+version = "0.1.0"
+description = "Universal hierarchical-structure serializer producing LLM-readable XML"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Aloysius" }]
+keywords = ["xmind", "markdown", "tree", "llm", "xml", "outline"]
+dependencies = []
+
+[project.scripts]
+struct2tree = "struct2tree.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["struct2tree*"]
+exclude = ["tests*"]
