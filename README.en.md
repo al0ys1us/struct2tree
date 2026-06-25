@@ -1,5 +1,7 @@
 # struct2tree
 
+[![tests](https://github.com/al0ys1us/struct2tree/actions/workflows/tests.yml/badge.svg)](https://github.com/al0ys1us/struct2tree/actions/workflows/tests.yml)
+
 [English](README.en.md) | [中文](README.md)
 
 A Python CLI tool that converts hierarchical data from many sources (mind maps, file trees, Markdown outlines, JSON, YAML, and more) into a single XML format optimized for LLM readability.

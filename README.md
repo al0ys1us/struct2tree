@@ -1,5 +1,7 @@
 # struct2tree
 
+[![tests](https://github.com/al0ys1us/struct2tree/actions/workflows/tests.yml/badge.svg)](https://github.com/al0ys1us/struct2tree/actions/workflows/tests.yml)
+
 [English](README.en.md) | [中文](README.md)
 
 将多种来源的层级结构数据（思维导图、文件树、Markdown 大纲、JSON、YAML 等）统一转换为一种对 LLM 可读性最优的 XML 格式的 Python CLI 工具。
