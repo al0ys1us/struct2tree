@@ -64,6 +64,12 @@ def build_parser() -> argparse.ArgumentParser:
         "--max-depth", type=int, help="limit maximum recursion depth"
     )
     p.add_argument(
+        "--meta-as-attrs",
+        action="store_true",
+        help="render meta keys as native XML attributes when valid "
+        "(falls back to meta=\"k:v\" otherwise)",
+    )
+    p.add_argument(
         "--wrap-code-block",
         action="store_true",
         help="wrap output in a ```xml code block",
@@ -151,7 +157,7 @@ def main(argv=None) -> int:
         print(f"error: failed to parse {fmt}: {exc}", file=sys.stderr)
         return 1
 
-    xml = convert(tree)
+    xml = convert(tree, meta_as_attrs=args.meta_as_attrs)
     if args.wrap_code_block:
         xml = f"```xml\n{xml}\n```"
 

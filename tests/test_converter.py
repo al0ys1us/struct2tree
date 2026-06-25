@@ -50,6 +50,48 @@ class TestConverter(unittest.TestCase):
         out = convert(tree)
         self.assertIn('meta="type:a,mode:b"', out)
 
+    def test_meta_as_attrs_valid_keys(self):
+        tree = Tree(
+            name="t",
+            roots=[TreeNode(label="x", meta={"type": "exact", "mode": "comp"})],
+        )
+        out = convert(tree, meta_as_attrs=True)
+        self.assertIn('type="exact"', out)
+        self.assertIn('mode="comp"', out)
+        self.assertNotIn("meta=", out)
+
+    def test_meta_as_attrs_default_is_packed(self):
+        # Without the flag, behavior is unchanged (backward compatible).
+        tree = Tree(name="t", roots=[TreeNode(label="x", meta={"type": "a"})])
+        self.assertIn('meta="type:a"', convert(tree))
+
+    def test_meta_as_attrs_invalid_key_falls_back(self):
+        tree = Tree(
+            name="t",
+            roots=[TreeNode(label="x", meta={"type": "a", "my key": "v"})],
+        )
+        out = convert(tree, meta_as_attrs=True)
+        self.assertIn('type="a"', out)          # valid -> native
+        self.assertIn('meta="my key:v"', out)   # invalid name -> packed
+
+    def test_meta_as_attrs_reserved_key_falls_back(self):
+        # 'label' collides with the intrinsic <n> attribute -> stays packed.
+        tree = Tree(
+            name="t",
+            roots=[TreeNode(label="x", meta={"type": "a", "label": "dup"})],
+        )
+        out = convert(tree, meta_as_attrs=True)
+        self.assertIn('type="a"', out)
+        self.assertIn('meta="label:dup"', out)
+
+    def test_meta_as_attrs_escapes_values(self):
+        tree = Tree(
+            name="t",
+            roots=[TreeNode(label="x", meta={"note": '<a> & "b"'})],
+        )
+        out = convert(tree, meta_as_attrs=True)
+        self.assertIn('note="&lt;a&gt; &amp; &quot;b&quot;"', out)
+
     def test_ref_path_to_id(self):
         # root with two children; ref between them
         tree = Tree(

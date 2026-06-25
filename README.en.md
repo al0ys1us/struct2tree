@@ -109,6 +109,7 @@ Options:
   --ignore <pattern>       directory mode: extra glob pattern to ignore (repeatable)
   --file-meta              directory mode: add size/ext meta to file nodes
   --max-depth <n>          limit maximum recursion depth (unlimited by default)
+  --meta-as-attrs          render valid meta keys as native XML attributes (falls back to meta="k:v")
   --wrap-code-block        wrap the output in a ```xml ... ``` code block
   --clipboard              copy the output to the system clipboard (instead of stdout)
   -v, --version            show the version
@@ -127,6 +128,20 @@ With `--parse-ref`, a `[ref]` region at the end of the file is parsed into refer
 
 ```
 [ref]: 1.2 -> 1.1.2 | depends-on | Article module relies on permission checks
+```
+
+### Meta rendering (`--meta-as-attrs`)
+
+By default a node's extra info is packed into a single `meta` attribute:
+
+```xml
+<n id="1.1" label="Sign Up / Login" meta="type:exact-match,mode:complement" />
+```
+
+With `--meta-as-attrs`, keys that are valid XML attribute names expand into native attributes (slightly more readable for an LLM, and fewer tokens); keys that aren't (spaces, colons, non-ASCII, or colliding with `id`/`label`/`meta`) fall back to `meta="..."`:
+
+```xml
+<n id="1.1" label="Sign Up / Login" type="exact-match" mode="complement" />
 ```
 
 ## Use as a Python library

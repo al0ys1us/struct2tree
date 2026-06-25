@@ -109,6 +109,7 @@ for f in *.xmind; do struct2tree "$f" -o "${f%.xmind}.xml"; done
   --ignore <pattern>       目录模式：额外忽略的 glob 模式（可多次使用）
   --file-meta              目录模式：为文件节点添加 size/ext meta
   --max-depth <n>          限制最大递归深度（默认不限制）
+  --meta-as-attrs          将合法的 meta key 渲染为原生 XML 属性（否则回退到 meta="k:v"）
   --wrap-code-block        将输出包裹在 ```xml ... ``` 代码块中
   --clipboard              输出到系统剪贴板（替代 stdout）
   -v, --version            显示版本号
@@ -127,6 +128,20 @@ for f in *.xmind; do struct2tree "$f" -o "${f%.xmind}.xml"; done
 
 ```
 [ref]: 1.2 -> 1.1.2 | depends-on | 文章模块依赖权限校验
+```
+
+### meta 的渲染形式（`--meta-as-attrs`）
+
+默认情况下，节点的附加信息打包进一个 `meta` 属性：
+
+```xml
+<n id="1.1" label="注册登录" meta="type:exact-match,mode:complement" />
+```
+
+加上 `--meta-as-attrs` 后，能作为合法 XML 属性名的 key 会展开成原生属性，对 LLM 略微更易读、token 也更省；不合法的 key（含空格、冒号、非 ASCII，或与 `id`/`label`/`meta` 撞名）自动回退到 `meta="..."`：
+
+```xml
+<n id="1.1" label="注册登录" type="exact-match" mode="complement" />
 ```
 
 ## 作为 Python 库调用

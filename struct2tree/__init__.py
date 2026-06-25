@@ -28,6 +28,7 @@ def convert_source(source: str, fmt: str | None = None, **options) -> str:
     """Parse a file (or, with ``content=...`` in options, raw text) and convert.
 
     ``fmt`` forces a parser; if omitted it is detected from the file extension.
+    ``meta_as_attrs=True`` renders valid meta keys as native XML attributes.
     """
     from . import detect
     from .parsers import get_parser
@@ -36,6 +37,7 @@ def convert_source(source: str, fmt: str | None = None, **options) -> str:
         fmt = detect.detect_by_extension(source)
         if fmt is None:
             raise ValueError(f"cannot detect format for: {source}")
+    meta_as_attrs = options.pop("meta_as_attrs", False)
     parser = get_parser(fmt)
     tree = parser.parse(source, options)
-    return convert(tree)
+    return convert(tree, meta_as_attrs=meta_as_attrs)
