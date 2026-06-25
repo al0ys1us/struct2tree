@@ -96,8 +96,33 @@ def legacy():
     write_xmind(os.path.join(HERE, "legacy.xmind"), {"content.xml": xml})
 
 
+def summary():
+    # Parent P with subtopics a/b/c; a summary topic covering the first two.
+    sheet = {
+        "title": "概要测试",
+        "rootTopic": {
+            "id": "P",
+            "title": "父主题",
+            "children": {
+                "attached": [
+                    {"id": "a", "title": "子主题A"},
+                    {"id": "b", "title": "子主题B"},
+                    {"id": "c", "title": "子主题C"},
+                ],
+                "summary": [{"id": "sumNode", "title": "前两项=核心能力"}],
+            },
+            "summaries": [{"id": "s1", "range": "(0,1)", "topicId": "sumNode"}],
+        },
+    }
+    write_xmind(
+        os.path.join(HERE, "summary.xmind"),
+        {"content.json": json.dumps([sheet], ensure_ascii=False)},
+    )
+
+
 if __name__ == "__main__":
     basic()
     multi()
     legacy()
+    summary()
     print("fixtures written")

@@ -53,7 +53,7 @@ pip install -e .
 
 | 格式 | 扩展名 / 触发 | 说明 |
 |------|--------------|------|
-| Xmind | `.xmind` | 新版 `content.json` 与旧版 `content.xml`，含 relationships |
+| Xmind | `.xmind` | 新版 `content.json` 与旧版 `content.xml`，含 relationships 与概要（summary） |
 | Markdown | `.md`, `.markdown` | 嵌套列表，可选 `{meta}` 与 `[ref]` 扩展语法 |
 | JSON | `.json` | 对象嵌套型（结构 A）与路径映射型（结构 B）自动识别 |
 | YAML | `.yaml`, `.yml` | 自实现简易 parser，支持 mapping / scalar / sequence |

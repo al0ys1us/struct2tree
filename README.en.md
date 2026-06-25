@@ -53,7 +53,7 @@ After installation the `struct2tree` command is available globally.
 
 | Format | Extension / trigger | Notes |
 |--------|---------------------|-------|
-| Xmind | `.xmind` | New-style `content.json` and legacy `content.xml`, including relationships |
+| Xmind | `.xmind` | New-style `content.json` and legacy `content.xml`, including relationships and summaries |
 | Markdown | `.md`, `.markdown` | Nested lists, with optional `{meta}` and `[ref]` extension syntax |
 | JSON | `.json` | Auto-detects object-nesting (structure A) and path-mapping (structure B) |
 | YAML | `.yaml`, `.yml` | Built-in minimal parser supporting mapping / scalar / sequence |

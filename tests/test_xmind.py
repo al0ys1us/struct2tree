@@ -55,6 +55,25 @@ class TestXmind(unittest.TestCase):
         with self.assertRaises(ValueError):
             x.parse(os.path.join(FIX, "make_xmind_fixtures.py"), {})
 
+    def test_summary_becomes_node_and_refs(self):
+        t = x.parse(os.path.join(FIX, "summary.xmind"), {})
+        parent = t.roots[0]
+        # summary topic appended after the 3 attached subtopics
+        self.assertEqual(len(parent.children), 4)
+        summary_node = parent.children[3]
+        self.assertEqual(summary_node.label, "前两项=核心能力")
+        self.assertEqual(summary_node.meta.get("role"), "summary")
+
+    def test_summary_refs_cover_correct_range(self):
+        t = x.parse(os.path.join(FIX, "summary.xmind"), {})
+        summarizes = [r for r in t.refs if r.rel == "summarizes"]
+        # covers subtopics a (index 0) and b (index 1), not c
+        self.assertEqual(len(summarizes), 2)
+        out = convert(t)
+        self.assertIn('<ref from="1.4" to="1.1" rel="summarizes" />', out)
+        self.assertIn('<ref from="1.4" to="1.2" rel="summarizes" />', out)
+        self.assertNotIn('to="1.3" rel="summarizes"', out)
+
 
 if __name__ == "__main__":
     unittest.main()
