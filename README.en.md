@@ -20,7 +20,7 @@ Zero external dependencies — standard library only (requires Python 3.10+).
 pip install -e .
 ```
 
-After installation the `struct2tree` command is available globally.
+After installation the `struct2tree` command is available globally. You can also run it without installing via the module form: `python3 -m struct2tree <input>`.
 
 ## Output format
 
@@ -56,10 +56,12 @@ After installation the `struct2tree` command is available globally.
 | Xmind | `.xmind` | New-style `content.json` and legacy `content.xml`, including relationships and summaries |
 | Markdown | `.md`, `.markdown` | Nested lists, with optional `{meta}` and `[ref]` extension syntax |
 | JSON | `.json` | Auto-detects object-nesting (structure A) and path-mapping (structure B) |
-| YAML | `.yaml`, `.yml` | Built-in minimal parser supporting mapping / scalar / sequence |
+| YAML | `.yaml`, `.yml` | Built-in minimal parser: block mapping / sequence / scalar, plus inline flow collections `[a, b]` / `{x: 1}` |
 | Indented text | `.txt` | 2 spaces or 1 tab per level |
 | Directory-tree text | `--format tree-text` / stdin | `tree` command ASCII box-art output, or indented text |
-| Filesystem directory | `--dir <path>` | Recursively scans a directory |
+| Filesystem directory | `--dir <path>` | Recursively scans a directory (does not follow symlinked directories, avoiding infinite recursion on loops) |
+
+> **YAML limitations**: the built-in parser covers common structures only. It does not support anchors/aliases (`&`/`*`) or multi-line block scalars (`|` / `>`). Those emit a warning and are handled best-effort (a block scalar's lines may be treated as child nodes). For full YAML compatibility, convert to JSON first with another tool, then feed that to struct2tree.
 
 ## Usage
 

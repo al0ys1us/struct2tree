@@ -61,7 +61,14 @@ def _scan(path: str, options: dict, depth: int) -> TreeNode:
     for e in entries:
         if _should_ignore(e.name, options):
             continue
-        (dirs if e.is_dir() else files).append(e)
+        # Do not follow symlinked directories: a symlink pointing at an
+        # ancestor would otherwise recurse infinitely. Treat them as leaves.
+        if e.is_symlink():
+            files.append(e)
+        elif e.is_dir(follow_symlinks=False):
+            dirs.append(e)
+        else:
+            files.append(e)
 
     dirs.sort(key=lambda e: e.name.lower())
     files.sort(key=lambda e: e.name.lower())

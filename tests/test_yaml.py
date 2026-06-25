@@ -41,6 +41,28 @@ class TestYAML(unittest.TestCase):
         self.assertEqual(len(items.children), 3)
         self.assertEqual(items.children[0].label, "one")
 
+    def test_flow_sequence(self):
+        t = parse("root:\n  items: [a, b, c]\n")
+        items = t.roots[0].children[0]
+        self.assertEqual([c.label for c in items.children], ["a", "b", "c"])
+
+    def test_flow_mapping(self):
+        t = parse("root:\n  cfg: {x: 1, y: 2}\n")
+        cfg = t.roots[0].children[0]
+        self.assertEqual(cfg.children[0].label, "x")
+        self.assertEqual(cfg.children[0].meta, {"value": "1"})
+
+    def test_nested_flow(self):
+        t = parse("root:\n  m: {a: [1, 2], b: x}\n")
+        m = t.roots[0].children[0]
+        a = m.children[0]
+        self.assertEqual([c.label for c in a.children], ["1", "2"])
+
+    def test_flow_with_quoted_comma(self):
+        t = parse('root:\n  items: ["a, b", c]\n')
+        items = t.roots[0].children[0]
+        self.assertEqual([c.label for c in items.children], ["a, b", "c"])
+
     def test_single_root(self):
         t = parse("only:\n")
         self.assertEqual(len(t.roots), 1)

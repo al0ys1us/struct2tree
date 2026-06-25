@@ -151,10 +151,18 @@ def main(argv=None) -> int:
         print(f"error: file not found: {source}", file=sys.stderr)
         return 1
     except ValueError as exc:
-        print(f"error: {exc}", file=sys.stderr)
-        return 1
-    except Exception as exc:  # parser-specific failures (json/yaml/xml)
+        # Parsers raise ValueError (incl. json.JSONDecodeError) for malformed
+        # input — report it as a parse error with the parser's message.
         print(f"error: failed to parse {fmt}: {exc}", file=sys.stderr)
+        return 1
+    except Exception as exc:
+        # Anything else is an unexpected internal error, not bad input. Surface
+        # the exception type so it isn't silently disguised as a parse failure.
+        print(
+            f"error: internal error while parsing {fmt}: "
+            f"{type(exc).__name__}: {exc}",
+            file=sys.stderr,
+        )
         return 1
 
     xml = convert(tree, meta_as_attrs=args.meta_as_attrs)

@@ -104,6 +104,20 @@ class TestDirectory(unittest.TestCase):
         with self.assertRaises(ValueError):
             d.parse("/nonexistent/path/xyz", {"dir": "/nonexistent/path/xyz"})
 
+    def test_symlink_loop_does_not_recurse(self):
+        # A symlink pointing back at an ancestor must not cause infinite
+        # recursion; it should appear as a leaf instead.
+        loop = os.path.join(self.tmp, "src", "loop")
+        try:
+            os.symlink(self.tmp, loop)
+        except (OSError, NotImplementedError):
+            self.skipTest("symlinks not supported on this platform")
+        t = self.parse()  # must return, not hang or crash
+        src = [c for c in t.roots[0].children if c.label == "src"][0]
+        loop_node = [c for c in src.children if c.label == "loop"][0]
+        # treated as a leaf — not recursed into
+        self.assertEqual(loop_node.children, [])
+
 
 if __name__ == "__main__":
     unittest.main()

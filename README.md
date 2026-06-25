@@ -20,7 +20,7 @@
 pip install -e .
 ```
 
-安装后 `struct2tree` 命令全局可用。
+安装后 `struct2tree` 命令全局可用。也可以不安装、直接用模块方式运行：`python3 -m struct2tree <input>`。
 
 ## 输出格式
 
@@ -56,10 +56,12 @@ pip install -e .
 | Xmind | `.xmind` | 新版 `content.json` 与旧版 `content.xml`，含 relationships 与概要（summary） |
 | Markdown | `.md`, `.markdown` | 嵌套列表，可选 `{meta}` 与 `[ref]` 扩展语法 |
 | JSON | `.json` | 对象嵌套型（结构 A）与路径映射型（结构 B）自动识别 |
-| YAML | `.yaml`, `.yml` | 自实现简易 parser，支持 mapping / scalar / sequence |
+| YAML | `.yaml`, `.yml` | 自实现简易 parser，支持块状 mapping / sequence / scalar，以及行内 flow 集合 `[a, b]` / `{x: 1}` |
 | 缩进纯文本 | `.txt` | 2 空格或 1 tab 为一层 |
 | 目录树文本 | `--format tree-text` / stdin | `tree` 命令的 ASCII box-art 输出，或缩进文本 |
-| 文件系统目录 | `--dir <path>` | 递归扫描目录 |
+| 文件系统目录 | `--dir <path>` | 递归扫描目录（不跟随符号链接目录，避免环导致的无限递归） |
+
+> **YAML 局限**：内置 parser 仅覆盖常见结构，不支持 anchors/aliases（`&`/`*`）、多行块标量（`|` / `>`）等高级特性。遇到这些会输出 warning 并 best-effort 处理（块标量的多行内容可能被当作子节点）。需要完整 YAML 兼容时，建议先用其他工具转成 JSON 再喂给本工具。
 
 ## 用法
 

@@ -264,7 +264,10 @@ def parse(source: str, options: dict) -> Tree:
         names = zf.namelist()
         if "content.json" in names:
             raw = zf.read("content.json")
-            sheets = json.loads(raw)
+            try:
+                sheets = json.loads(raw)
+            except json.JSONDecodeError as exc:
+                raise ValueError(f"invalid content.json in xmind: {exc}") from exc
             if not isinstance(sheets, list):
                 sheets = [sheets]
             if sheet_idx >= len(sheets):
@@ -274,7 +277,10 @@ def parse(source: str, options: dict) -> Tree:
                 )
             tree = _parse_json_sheet(sheets[sheet_idx])
         elif "content.xml" in names:
-            tree = _parse_xml(zf.read("content.xml"))
+            try:
+                tree = _parse_xml(zf.read("content.xml"))
+            except ET.ParseError as exc:
+                raise ValueError(f"invalid content.xml in xmind: {exc}") from exc
         else:
             raise ValueError(
                 "xmind file contains neither content.json nor content.xml"

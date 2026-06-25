@@ -45,6 +45,79 @@ def _clean_scalar(value: str) -> str:
     return value
 
 
+def _split_flow(body: str) -> list[str]:
+    """Split a flow-collection body on top-level commas only.
+
+    Nested brackets and quoted segments are respected, so
+    ``a, [b, c], "d, e"`` yields three parts.
+    """
+    parts: list[str] = []
+    depth = 0
+    in_single = in_double = False
+    buf: list[str] = []
+    for ch in body:
+        if ch == "'" and not in_double:
+            in_single = not in_single
+        elif ch == '"' and not in_single:
+            in_double = not in_double
+        if not in_single and not in_double:
+            if ch in "[{":
+                depth += 1
+            elif ch in "]}":
+                depth -= 1
+            elif ch == "," and depth == 0:
+                parts.append("".join(buf))
+                buf = []
+                continue
+        buf.append(ch)
+    if "".join(buf).strip():
+        parts.append("".join(buf))
+    return parts
+
+
+def _flow_to_nodes(val: str) -> list[TreeNode] | None:
+    """Expand an inline flow sequence/mapping into child nodes.
+
+    ``[a, b, c]`` -> three leaf nodes; ``{x: 1, y: 2}`` -> nodes ``x``/``y``
+    with ``value`` meta. Returns None if ``val`` is not a flow collection.
+    Nested flow collections recurse.
+    """
+    val = val.strip()
+    if len(val) < 2:
+        return None
+
+    if val[0] == "[" and val[-1] == "]":
+        nodes: list[TreeNode] = []
+        for item in _split_flow(val[1:-1]):
+            child = _flow_to_nodes(item)
+            if child is not None:
+                # wrap a nested collection under a positional placeholder
+                nodes.extend(child)
+            else:
+                nodes.append(TreeNode(label=_clean_scalar(item)))
+        return nodes
+
+    if val[0] == "{" and val[-1] == "}":
+        nodes = []
+        for pair in _split_flow(val[1:-1]):
+            k, sep, v = pair.partition(":")
+            k = _clean_scalar(k)
+            if not k:
+                continue
+            node = TreeNode(label=k)
+            v = v.strip()
+            if sep and v:
+                nested = _flow_to_nodes(v)
+                if nested is not None:
+                    node.children.extend(nested)
+                else:
+                    node.meta = {"value": _clean_scalar(v)}
+            nodes.append(node)
+        return nodes
+
+    return None
+
+
 def _warn_complex(line: str) -> None:
     stripped = line.strip()
     if stripped.startswith("&") or " &" in line:
@@ -111,7 +184,11 @@ def _parse_lines(lines: list[str]) -> list[TreeNode]:
         stack.append((indent, node))
 
         if val and val not in ("|", ">"):
-            node.meta = {"value": _clean_scalar(val)}
+            flow = _flow_to_nodes(val)
+            if flow is not None:
+                node.children.extend(flow)
+            else:
+                node.meta = {"value": _clean_scalar(val)}
 
     return roots
 
